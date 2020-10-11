@@ -48,91 +48,11 @@ public class WeatherInitializerRunner implements CommandLineRunner {
     @Value("${API_KEY}")
     private String API_KEY;
 
-    /*
-    @Override
-    public void run(String... args) throws Exception {
-        // clear database
-        System.out.println("==========Deleting all entries==========");
-        weatherDataRepository.deleteAll();
-        cityRepository.deleteAll();
-        databaseSequenceRepository.deleteAll();
-
-        // save documents to mongodb
-        cityRepository.saveAll(Arrays.asList(
-                new City(sequenceGeneratorService.generateSequence(City.SEQUENCE_NAME), "Boston"),
-                new City(sequenceGeneratorService.generateSequence(City.SEQUENCE_NAME), "New York"),
-                new City(sequenceGeneratorService.generateSequence(City.SEQUENCE_NAME), "Chicago"),
-                new City(sequenceGeneratorService.generateSequence(City.SEQUENCE_NAME), "Seattle"),
-                new City(sequenceGeneratorService.generateSequence(City.SEQUENCE_NAME), "Los Angeles")
-        ));
-        weatherDataRepository.saveAll(Arrays.asList(
-                new WeatherData(sequenceGeneratorService.generateSequence(WeatherData.SEQUENCE_NAME),
-                        cityRepository.findAllByCity("Boston").get(0),
-                        Instant.now().toEpochMilli(),
-                        11.1,
-                        WeatherCondition.CLEAR_SKY),
-                new WeatherData(sequenceGeneratorService.generateSequence(WeatherData.SEQUENCE_NAME),
-                        cityRepository.findAllByCity("Boston").get(0),
-                        Instant.now().toEpochMilli()-100,
-                        11.3,
-                        WeatherCondition.CLEAR_SKY),
-                new WeatherData(sequenceGeneratorService.generateSequence(WeatherData.SEQUENCE_NAME),
-                        cityRepository.findAllByCity("Boston").get(0),
-                        Instant.now().toEpochMilli()-200,
-                        11.5,
-                        WeatherCondition.CLEAR_SKY),
-                new WeatherData(sequenceGeneratorService.generateSequence(WeatherData.SEQUENCE_NAME),
-                        cityRepository.findAllByCity("Chicago").get(0),
-                        Instant.now().toEpochMilli()-200,
-                        11.5,
-                        WeatherCondition.CLEAR_SKY)
-        ));
-
-        // Initial List
-        List<WeatherData> weatherDataList = null;
-
-        // fetch all documents
-        System.out.println("======Fetch All=====");
-        weatherDataList = weatherDataRepository.findAll();
-        weatherDataList.forEach(System.out::println);
-
-        // fetch by city
-        System.out.println("======Fetch All by City Boston=====");
-        weatherDataList = weatherDataRepository.findAllByCity("Boston");
-        weatherDataList.forEach(System.out::println);
-
-        // fetch all cities
-        System.out.println("======Fetch All Cities=====");
-        List<City> cities = cityRepository.findAll();
-        cities.forEach(System.out::println);
-
-        // fetch current for Boston
-//        System.out.println("======Fetch All for Boston And for Current Day=====");
-//        long startOfDay = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-//        long endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-//        System.out.println("Start Of Day: " + startOfDay);
-//        System.out.println("End Of Day: " + endOfDay);
-//        weatherDataList = weatherDataRepository.findAllByCityAndTimestampIsBetween("Boston", startOfDay, endOfDay);
-//        weatherDataList.forEach(System.out::println);
-//        weatherDataList = weatherDataService.getHourlyTempForToday("Boston");
-//        weatherDataList.forEach(System.out::println);
-//        weatherDataList = weatherDataRepository.findAllByTimestampGreaterThanEqual(startOfDay);
-//        weatherDataList.forEach(System.out::println);
-//        weatherDataList = weatherDataRepository.findAllByTemperatureIsBetween(11.1, 11.5);
-//        weatherDataList.forEach(System.out::println);
-    }
-     */
-
     @Override
     public void run(String... args) throws Exception {
         clearDatabase();
-
         fetchDataForAllCities();
 
-//        // fetch all documents
-//        System.out.println("======Fetch All=====");
-//        List<WeatherData> weatherDataList = weatherDataRepository.findAll();
-//        weatherDataList.forEach(System.out::println);
     }
 
     public void clearDatabase() {
@@ -154,18 +74,40 @@ public class WeatherInitializerRunner implements CommandLineRunner {
         System.out.println("Fetching weather data...");
         LocalDateTime now = LocalDateTime.now();
 
-        // fetch for last 5 days
-        for(int i = 1; i <= 5; i++) {
-            LocalDateTime previous = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth()-i, now.getHour(), now.getMinute());
-            String timestamp = String.valueOf(previous.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000);
+        // fetch for all cities
+        for(String city : WeatherUtil.cities.keySet()) {
+            // fetch last 48 hours data
+            fetchLatestDataForCity(city);
 
-            // fetch for all cities
-            for(String city : WeatherUtil.cities.keySet()){
+            // fetch for last 5 days
+            for (int i = 1; i <= 5; i++) {
+                LocalDateTime previous = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth() - i, now.getHour(), now.getMinute());
+                String timestamp = String.valueOf(previous.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000);
                 fetchDataForCityForTime(city, timestamp);
             }
         }
 
         System.out.println("Fetching weather data completed!");
+    }
+
+    public void fetchLatestDataForCity(String city) throws IOException, InterruptedException {
+//        System.out.println(String.format("=====Fetching latest data for %s", city));
+        WeatherUtil.CityCoord cityCoord = WeatherUtil.cities.get(city);
+        if(cityCoord == null) return;
+
+        var client = HttpClient.newHttpClient();
+
+        // Query last 48 hours data
+        URI uri1 = URI.create(WeatherUtil.API_BASE_URL
+                + "?appid=" + API_KEY
+                + "&lat=" + cityCoord.getLatitude()
+                + "&lon=" + cityCoord.getLongitude()
+                + "&units=metric");
+        var request1 = HttpRequest.newBuilder(uri1)
+                .header("accept", "application/json")
+                .build();
+        HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        saveDataFromResponse(response1, city);
     }
 
     public void fetchDataForCityForTime(String city, String timestamp) throws IOException, InterruptedException {
@@ -175,21 +117,22 @@ public class WeatherInitializerRunner implements CommandLineRunner {
 
         var client = HttpClient.newHttpClient();
 
-        URI uri = URI.create(WeatherUtil.API_BASE_URL
-                    + "?appid=" + API_KEY
+        // Query historical records from last 5 days
+        URI uri2 = URI.create(WeatherUtil.API_BASE_URL
+                    + "/timemachine?appid=" + API_KEY
                     + "&lat=" + cityCoord.getLatitude()
                     + "&lon=" + cityCoord.getLongitude()
                     + "&units=metric"
                     + "&dt=" + timestamp);
-
-        var request = HttpRequest.newBuilder(uri)
+        var request2 = HttpRequest.newBuilder(uri2)
                 .header("accept", "application/json")
                 .build();
+        HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+        saveDataFromResponse(response2, city);
+    }
 
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
+    public void saveDataFromResponse(HttpResponse<String> response, String city) {
         List<WeatherData> weatherDataList = new ArrayList<>();
-
         try {
             JSONObject json = new JSONObject(response.body());
             JSONArray hourly = json.getJSONArray("hourly");
@@ -206,7 +149,7 @@ public class WeatherInitializerRunner implements CommandLineRunner {
                 weatherDataList.add(weatherData);
             }
         } catch (JSONException e) {
-            System.out.println(String.format("Unable to fetch data for ${} at ${}", city, timestamp));
+            System.out.println(String.format("Unable to fetch data for %s", city));
             return;
         }
 

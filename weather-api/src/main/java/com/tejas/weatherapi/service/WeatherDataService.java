@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -18,9 +17,9 @@ public class WeatherDataService {
 
     // get current temp and condition
     public CurrentWeatherForCity getCurrentWeather(String city) {
-        long currentTime = Instant.now().toEpochMilli();
-        WeatherData less = weatherDataRepository.findFirstByCityAndTimestampBefore(city, currentTime);
-        WeatherData greater = weatherDataRepository.findFirstByCityAndTimestampAfter(city, currentTime);
+        long currentTime = Instant.now().toEpochMilli() / 1000;
+        WeatherData less = weatherDataRepository.findAllByCityAndTimestampBeforeOrderByTimestampDesc(city, currentTime).get(0);
+        WeatherData greater = weatherDataRepository.findAllByCityAndTimestampAfterOrderByTimestampAsc(city, currentTime).get(0);
 
         WeatherData current = null;
 
