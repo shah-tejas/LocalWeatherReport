@@ -9,4 +9,5 @@ public @Data class CurrentWeatherForCity {
     private String city;
     private double temperature;
     private WeatherCondition weatherCondition;
+    private String day;
 }

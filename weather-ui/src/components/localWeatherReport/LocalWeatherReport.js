@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './LocalWeatherReport.scss';
 import { CITIES_API_URL } from '../../utils/constants';
-import CitiesSelect from '../citiesSelect/CitiesSelect';
+import { CitiesSelect, CurrentWeather, WeekWeather } from '../../components';
 
 const LocalWeatherReport = () => {
 
@@ -20,7 +20,12 @@ const LocalWeatherReport = () => {
     return (
         <div>
             <CitiesSelect cities={cities} onCitiesSelect={setCity} />
-            {city}
+            {city &&
+                <CurrentWeather city={city} />
+            }
+            {city &&
+                <WeekWeather city={city} />
+            }
         </div>
     );
 }

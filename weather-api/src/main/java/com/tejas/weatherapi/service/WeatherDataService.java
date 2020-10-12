@@ -23,6 +23,7 @@ public class WeatherDataService {
     // get current temp and condition
     public CurrentWeatherForCity getCurrentWeather(String city) {
         long currentTime = Instant.now().toEpochMilli() / 1000;
+
         WeatherData less = weatherDataRepository.findAllByCityAndTimestampBeforeOrderByTimestampDesc(city, currentTime).get(0);
         WeatherData greater = weatherDataRepository.findAllByCityAndTimestampAfterOrderByTimestampAsc(city, currentTime).get(0);
 
@@ -34,7 +35,7 @@ public class WeatherDataService {
             current = less;
         }
 
-        return new CurrentWeatherForCity(city, current.getTemperature(), current.getWeatherCondition());
+        return new CurrentWeatherForCity(city, current.getTemperature(), current.getWeatherCondition(), Instant.now().atZone(ZoneId.systemDefault()).getDayOfWeek().toString());
     }
 
     // get today's hourly temp for city

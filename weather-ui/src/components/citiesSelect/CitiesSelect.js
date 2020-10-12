@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import './CitiesSelect.scss';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
 
 const CitiesSelect = ({ cities, onCitiesSelect }) => {
     const [selectedCity, setSelectedCity] = useState('');
@@ -12,15 +14,20 @@ const CitiesSelect = ({ cities, onCitiesSelect }) => {
     };
     return (
         <div>
-            <Select
-                id="select-city"
-                value={selectedCity}
-                onChange={onSelect}
-            >
-                {cities.map(city => (
-                    <MenuItem value={city.city} key={city.id}>{city.city}</MenuItem>
-                ))}
-            </Select>
+            <FormControl className="select-form-control">
+                <InputLabel id="select-label">Select a City</InputLabel>
+                <Select
+                    labelId="select-label"
+                    id="select-city"
+                    value={selectedCity}
+                    onChange={onSelect}
+                    label="Select a City"
+                >
+                    {cities.map(city => (
+                        <MenuItem value={city.city} key={city.id}>{city.city}</MenuItem>
+                    ))}
+                </Select>
+            </FormControl>
         </div>
     );
 }
