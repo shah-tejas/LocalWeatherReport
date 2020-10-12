@@ -12,7 +12,12 @@ public interface WeatherDataRepository extends MongoRepository<WeatherData, Long
     List<WeatherData> findAllByCity(String city);
 
     @Query("{'city.city': ?0}")
-    List<WeatherData> findAllByCityAndTimestampIsBetween(String city, long startTime, long endTime);
+    List<WeatherData> findAllByCityAndTimestampBetweenOrderByTimestampAsc(String city, long timestampStart, long timestampEnd);
+
+    @Query("{'city.city': ?0}")
+    List<WeatherData> findByCityAndTimestampBetween(String city, long timestampStart, long timestampEnd);
+
+    List<WeatherData> findByTimestampBetween(long timestampStart, long timestampEnd);
 
     @Query("{'city.city': ?0}")
     List<WeatherData> findAllByCityAndTimestampBeforeOrderByTimestampDesc(String city, long time);
