@@ -7,6 +7,7 @@ const LocalWeatherReport = () => {
 
     const [cities, setCities] = useState([]);
     const [city, setCity] = useState('');
+    const [celsius, setCelsius] = useState(true);
 
     useEffect(() => {
         const fetchCities = async () => {
@@ -21,10 +22,10 @@ const LocalWeatherReport = () => {
         <div className="container">
             <CitiesSelect cities={cities} onCitiesSelect={setCity} />
             {city &&
-                <CurrentWeather city={city} />
+                <CurrentWeather city={city} celsius={celsius} setCelsius={setCelsius} />
             }
             {city &&
-                <WeekWeather city={city} />
+                <WeekWeather city={city} celsius={celsius} />
             }
         </div>
     );

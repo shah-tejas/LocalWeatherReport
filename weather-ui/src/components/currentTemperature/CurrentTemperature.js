@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './CurrentTemperature.scss';
 
-const CurrentTemperature = ({ temperature }) => {
-    
-    const [celsius, setCelsius] = useState(true);
+const CurrentTemperature = ({ temperature, celsius, setCelsius }) => {
+
     const [temperatureInt, setTemperatureInt] = useState();
 
     useEffect(() => {
@@ -13,7 +12,6 @@ const CurrentTemperature = ({ temperature }) => {
 
     const onClickHandler = (e) => {
         setCelsius(!celsius);
-        // setTemperatureInt(celsius ? parseInt(temperature) : parseInt(temperature * 1.8 + 32));
     }
 
     return (
@@ -40,7 +38,9 @@ const CurrentTemperature = ({ temperature }) => {
 
 
 CurrentTemperature.propTypes = {
-    temperature: PropTypes.string
+    temperature: PropTypes.string,
+    celsius: PropTypes.string,
+    setCelsius: PropTypes.func
 };
 
 

@@ -1,0 +1,16 @@
+.week-day-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: grey;
+
+    .temp-group {
+        width: 55%;
+        display: flex;
+        justify-content: space-between;
+        div:first-child {
+            color: black;
+        }
+    }
+}

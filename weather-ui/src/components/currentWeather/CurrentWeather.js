@@ -4,7 +4,7 @@ import './CurrentWeather.scss';
 import { CURRENT_WEATHER_API_URL } from '../../utils/constants';
 import { CurrentTemperature, WeatherConditionIcon } from '../../components';
 
-const CurrentWeather = ({ city }) => {
+const CurrentWeather = ({ city, celsius, setCelsius }) => {
     const [temp, setTemp] = useState('');
     const [day, setDay] = useState('');
     const [condition, setCondition] = useState('');
@@ -30,7 +30,7 @@ const CurrentWeather = ({ city }) => {
                     && <WeatherConditionIcon conditionType={condition} />
                 }
                 {temp
-                    && <CurrentTemperature temperature={temp} />
+                    && <CurrentTemperature celsius={celsius} setCelsius={setCelsius} temperature={temp} />
                 }
             </div>
             
@@ -40,7 +40,9 @@ const CurrentWeather = ({ city }) => {
 
 
 CurrentWeather.propTypes = {
-    city: PropTypes.string.isRequired
+    city: PropTypes.string.isRequired,
+    celsius: PropTypes.string,
+    setCelsius: PropTypes.func
 };
 
 

@@ -2,8 +2,9 @@ import React, { useState, useEffect }  from 'react';
 import PropTypes from 'prop-types';
 import './WeekWeather.scss';
 import { WEEK_WEATHER_API_URL, WEEK_SHORT_NAME } from '../../utils/constants';
+import { WeekDayWeather } from '..';
 
-const WeekWeather = ({ city }) => {
+const WeekWeather = ({ city, celsius }) => {
     const [weekWeather, setWeekWeather] = useState([]);
 
     useEffect(() => {
@@ -16,14 +17,15 @@ const WeekWeather = ({ city }) => {
     }, [city]);
 
     return (
-        <div>
+        <div className="week-weather">
             {weekWeather.map((weather, index) => (
-                <div key={index}>
-                    <p>{WEEK_SHORT_NAME[weather.dayOfWeek]}</p>
-                    <p>{weather.weatherCondition}</p>
-                    <p>{weather.minTemp}</p>
-                    <p>{weather.maxTemp}</p>
-                </div>
+                <WeekDayWeather
+                    key={index}
+                    dayOfWeek={WEEK_SHORT_NAME[weather.dayOfWeek]}
+                    weatherCondition={weather.weatherCondition}
+                    minTemp={parseInt(celsius ? weather.minTemp : (weather.minTemp * 1.8 + 32))}
+                    maxTemp={parseInt(celsius ? weather.maxTemp : (weather.maxTemp * 1.8 + 32))}
+                />
             ))}
         </div>
     );
@@ -31,7 +33,8 @@ const WeekWeather = ({ city }) => {
 
 
 WeekWeather.propTypes = {
-    city: PropTypes.string.isRequired
+    city: PropTypes.string.isRequired,
+    celsius: PropTypes.string
 };
 
 
