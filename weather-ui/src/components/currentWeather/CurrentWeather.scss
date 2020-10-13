@@ -1,0 +1,18 @@
+.current-weather-container {
+    padding-top: 20px;
+
+    p {
+        margin: 2px 0px;
+        color: grey;
+    }
+}
+
+.city-section {
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.condition-and-temp {
+    display: flex;
+}
+

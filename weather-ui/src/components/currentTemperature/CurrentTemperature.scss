@@ -1,0 +1,16 @@
+.temperature-wrapper {
+    display: flex;
+    align-self: center;
+    .temp {
+        margin: 0px;
+        font-weight: 600;
+        font-size: 72px;
+        color: black;
+    }
+    .clickable {
+        color: blue;
+    }
+    .clickable:hover {
+        cursor: pointer;
+    }
+}

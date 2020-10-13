@@ -13,7 +13,7 @@ const CitiesSelect = ({ cities, onCitiesSelect }) => {
         onCitiesSelect(event.target.value);
     };
     return (
-        <div>
+        <div className="cities-select">
             <FormControl className="select-form-control">
                 <InputLabel id="select-label">Select a City</InputLabel>
                 <Select
