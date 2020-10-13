@@ -18,7 +18,7 @@ const LocalWeatherReport = () => {
     }, []);
 
     return (
-        <div>
+        <div className="container">
             <CitiesSelect cities={cities} onCitiesSelect={setCity} />
             {city &&
                 <CurrentWeather city={city} />

@@ -1,0 +1,15 @@
+export { default as Ash } from './Ash.svg';
+export { default as Clear } from './Clear.svg';
+export { default as Clouds } from './Clouds.svg';
+export { default as Drizzle } from './Drizzle.svg';
+export { default as Dust } from './Dust.svg';
+export { default as Fog } from './Fog.svg';
+export { default as Haze } from './Haze.svg';
+export { default as Mist } from './Mist.svg';
+export { default as Rain } from './Rain.svg';
+export { default as Sand } from './Sand.svg';
+export { default as Smoke } from './Smoke.svg';
+export { default as Snow } from './Snow.svg';
+export { default as Squall } from './Squall.svg';
+export { default as Thunderstom } from './Thunderstom.svg';
+export { default as Tornado } from './Tornado.svg';

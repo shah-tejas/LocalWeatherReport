@@ -52,7 +52,6 @@ public class WeatherInitializerRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         clearDatabase();
         fetchDataForAllCities();
-
     }
 
     public void clearDatabase() {
