@@ -3,9 +3,14 @@ import PropTypes from 'prop-types';
 import './WeekDayWeather.scss';
 import { WeatherConditionIcon } from '..';
 
-const WeekDayWeather = ({ dayOfWeek, minTemp, maxTemp, weatherCondition }) => {
+const WeekDayWeather = ({ dayOfWeek, minTemp, maxTemp, weatherCondition, date, setDate }) => {
+
+    const onClickHandler = () => {
+        setDate(date);
+    }
+
     return (
-        <div className="week-day-container">
+        <div className="week-day-container" onClick={onClickHandler}>
             <div>{dayOfWeek}</div>
             <WeatherConditionIcon conditionType={weatherCondition} />
             <div className="temp-group">
@@ -21,7 +26,9 @@ WeekDayWeather.propTypes = {
     dayOfWeek: PropTypes.string,
     minTemp: PropTypes.string,
     maxTemp: PropTypes.string,
-    weatherCondition: PropTypes.string
+    weatherCondition: PropTypes.string,
+    date: PropTypes.string,
+    setDate: PropTypes.func
 };
 
 
