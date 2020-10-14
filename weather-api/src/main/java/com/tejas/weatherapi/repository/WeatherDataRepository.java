@@ -1,6 +1,5 @@
 package com.tejas.weatherapi.repository;
 
-import com.tejas.weatherapi.model.City;
 import com.tejas.weatherapi.model.WeatherData;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -14,8 +13,7 @@ public interface WeatherDataRepository extends MongoRepository<WeatherData, Long
     @Query("{'city.city': ?0}")
     List<WeatherData> findAllByCityAndTimestampBetweenOrderByTimestampAsc(String city, long timestampStart, long timestampEnd);
 
-    @Query("{'city.city': ?0}")
-    List<WeatherData> findByCityAndTimestampBetween(String city, long timestampStart, long timestampEnd);
+    List<WeatherData> findByTimestamp(long timestamp);
 
     List<WeatherData> findByTimestampBetween(long timestampStart, long timestampEnd);
 

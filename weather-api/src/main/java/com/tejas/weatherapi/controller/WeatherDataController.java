@@ -1,6 +1,7 @@
 package com.tejas.weatherapi.controller;
 
 import com.tejas.weatherapi.model.dto.CurrentWeatherForCity;
+import com.tejas.weatherapi.model.dto.HourlyWeather;
 import com.tejas.weatherapi.model.dto.WeeklyDataForCity;
 import com.tejas.weatherapi.service.WeatherDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +28,11 @@ public class WeatherDataController {
     @ResponseBody
     public ResponseEntity<List<WeeklyDataForCity>> getWeeklyWeatherData(@RequestParam String city) {
         return new ResponseEntity<>(weatherDataService.getCurrentWeekWeatherDetails(city), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/hourlyWeather")
+    @ResponseBody
+    public ResponseEntity<List<HourlyWeather>> getHourlyWeatherForCityForDate(@RequestParam String city, @RequestParam String date) {
+        return new ResponseEntity<>(weatherDataService.getHourlyWeatherForCityForDate(city, date), HttpStatus.OK);
     }
 }

@@ -3,6 +3,7 @@ package com.tejas.weatherapi.service;
 import com.tejas.weatherapi.model.WeatherCondition;
 import com.tejas.weatherapi.model.WeatherData;
 import com.tejas.weatherapi.model.dto.CurrentWeatherForCity;
+import com.tejas.weatherapi.model.dto.HourlyWeather;
 import com.tejas.weatherapi.model.dto.WeeklyDataForCity;
 import com.tejas.weatherapi.repository.WeatherDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class WeatherDataService {
 
         for(int i = 0; i < 7; i++) {
             LocalDate dayToCalc = localDate.minusDays(i);
-            String dayOfWeek = dayToCalc.getDayOfWeek().toString();
+            String dayOfWeek = dayToCalc.toString();
 
             if(i == 6) dayToCalc = localDate.minusDays(i-1);
 
@@ -58,7 +59,7 @@ public class WeatherDataService {
             long endOfDay = LocalDateTime.of(dayToCalc, LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() / 1000;
             List<WeatherData> currentDayData = weatherDataRepository.findByTimestampBetween(startOfDay, endOfDay);
 
-            weeklyData.add(getWeatherDetailsForDay(currentDayData, city, (i == 6) ? dayOfWeek : localDate.minusDays(i).getDayOfWeek().toString()));
+            weeklyData.add(getWeatherDetailsForDay(currentDayData, city, (i == 6) ? dayOfWeek : localDate.minusDays(i).toString()));
         }
         Collections.reverse(weeklyData);
 
@@ -66,7 +67,7 @@ public class WeatherDataService {
 
     }
 
-    public WeeklyDataForCity getWeatherDetailsForDay(List<WeatherData> currentDayData, String city, String day) {
+    public WeeklyDataForCity getWeatherDetailsForDay(List<WeatherData> currentDayData, String city, String date) {
         double min = Double.MAX_VALUE;
         double max = Double.MIN_VALUE;
         Map<String, Integer> weatherConditionIntegerMap = new HashMap<>();
@@ -93,6 +94,37 @@ public class WeatherDataService {
             }
         }
 
-        return new WeeklyDataForCity(day, min, max, weatherCondition);
+        return new WeeklyDataForCity(LocalDate.parse(date).getDayOfWeek().toString(), date, min, max, weatherCondition);
+    }
+
+    public HourlyWeather getWeatherForCityForHour(String city, int hour, LocalDate day) {
+
+        long timestamp = (LocalDateTime.of(day, LocalTime.of(hour, 0))
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+                .toEpochMilli()) / 1000;
+
+        List<WeatherData> weatherDataList = weatherDataRepository.findByTimestamp(timestamp);
+
+        for(WeatherData weatherData : weatherDataList) {
+            if(weatherData.getCity().getCity().equals(city)) {
+                return new HourlyWeather(hour, (int)weatherData.getTemperature());
+            }
+        }
+
+        return null;
+
+    }
+
+    public List<HourlyWeather> getHourlyWeatherForCityForDate(String city, String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        List<HourlyWeather> hourly = new ArrayList<>();
+        for(int i = 0; i < 24; i++) {
+            HourlyWeather h = getWeatherForCityForHour(city, i, localDate);
+            if(h != null) {
+                hourly.add(h);
+            }
+        }
+        return hourly;
     }
 }
