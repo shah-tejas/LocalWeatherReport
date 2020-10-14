@@ -1,5 +1,7 @@
 # Local Weather Report
 
+![screenshot](screenshot.png)
+
 ## Project Features
 - Weather information for 10 major cities in USA
 - Get Current Temperature as well as Current Weather Condition
